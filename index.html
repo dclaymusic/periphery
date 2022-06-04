@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>P &nbsp;&nbsp; E &nbsp;&nbsp; R &nbsp;&nbsp; I &nbsp;&nbsp; P &nbsp;&nbsp; H &nbsp;&nbsp; E &nbsp;&nbsp; R &nbsp;&nbsp; Y</title>
+<style>
+    html {background-color: #fcf9ef}
+
+    html,
+    body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    border: 0;
+    overflow: hidden;
+    /*  Disable scrollbars */
+    display: block;
+    /* No floating content on sides */
+    }
+
+    #header {
+    font-family: Verdana;
+    font-weight: normal;
+    text-align: center;
+    font-size: 12px;
+    }
+
+    /* canvas {
+        width: 720px;
+        height: 300px;
+    } */
+
+    #info { 
+        visibility: visible;
+        text-align: center;
+        font-family: Verdana;
+        font-weight: normal;
+        font-size: 12px;
+        position: relative;
+        bottom: 1000px;
+    }
+
+    a:link, a:visited { color: 'black'; }
+
+    #dot { 
+        visibility: hidden;
+        text-align: center;
+        font-family: Verdana;
+        font-weight: normal;
+        font-size: 12px;
+    }
+
+    #info2 { 
+        visibility: hidden;
+        text-align: center;
+        font-family: Verdana;
+        font-weight: normal;
+        font-size: 12px;
+        position: relative;
+        bottom: 778px;
+    }
+
+</style>
+
+<script src="snd.js"></script>
+<script src="snd-handler.js"></script>
+<script src="maps.js"></script>
+<script src="clouds.js"></script>
+<script type="text/javascript">
+
+
+
+
+
+        const w = screen.width;
+        const h = screen.height;
+        const colorA = "rgba(56,196,157,1)"; //sea light green
+        const colorB = "rgba(34,68,51,1)"; //land dark green
+        const colorC = "rgba(255,82,68,1)"; //bottom sky red
+        const colorD = "rgba(254,211,106,1)"; // top sky yellow
+        var startA = 0.51; //0.68
+        var startB = 0.5; //0.66
+        var startC = 0.32; //0.33
+        var startD = 0.16; //0.16
+        const waveNum = 1500;
+        const cloudNum = 75;
+        var gradientA, gradientB, gradientC, gradientD;
+        var canPlayCello = false;
+        var canPlayPiano = false; 
+        var canPlayFlute = false;
+        var canPlaySine1 = false; 
+        var canPlaySine2 = false; 
+        var canPlaySine3;
+        var speedA = 30;
+        var speedB = 2;
+        var speedC = 8;
+        var speedD = 9;
+        var setA = [];
+        var setB = [];
+        var setC = [];
+        var setD = [];
+        
+
+        var ctx = null;
+        var isPlaying = false;
+        var allBuffersLoaded = false;
+        const tileW = 20, tileH = 20;
+        var currentSecond = 0, frameCount = 0, framesLastSecond = 0, lastFrameTime = 0;
+
+        const audioCtx = new AudioContext();
+        var masterGain = audioCtx.createGain();
+
+
+        
+        loadclick();
+        loadcello01(); loadcello02(); loadcello03(); loadcello04(); loadcello05(); loadcello06(); loadcello07(); loadcello08(); loadcello09(); loadcello10(); loadcello11(); loadcello12(); loadcello13(); loadcello14(); loadcello15(); loadcello16(); loadcello17(); loadcello18(); loadcello19(); loadcello20(); loadcello21(); loadcello22(); loadcello23(); loadcello24(); loadcello25(); loadcello26(); loadcello27(); loadcello28(); loadcello29(); loadcello30(); loadcello31(); loadcello32(); loadcello33(); loadcello34(); loadcello35(); loadcello36(); loadcello37(); loadcello38(); loadcello39();
+        loadflute01(); loadflute02(); loadflute03(); loadflute04(); loadflute05(); loadflute06(); loadflute07(); loadflute08(); loadflute09(); loadflute10(); loadflute11(); loadflute12(); loadflute13(); loadflute14(); loadflute15(); loadflute16(); loadflute17(); loadflute18(); loadflute19(); loadflute20(); loadflute21(); loadflute22(); loadflute23(); loadflute24(); loadflute25(); loadflute26(); loadflute27(); loadflute28(); loadflute29(); loadflute30(); loadflute31(); loadflute32(); loadflute33(); loadflute34(); loadflute35(); 
+        loadpiano01(); loadpiano02(); loadpiano03(); loadpiano04(); loadpiano05(); loadpiano06(); loadpiano07(); loadpiano08(); loadpiano09(); loadpiano10(); loadpiano11(); loadpiano12(); loadpiano13(); loadpiano14(); loadpiano15(); loadpiano16(); loadpiano17(); loadpiano18(); loadpiano19(); loadpiano20(); loadpiano21(); loadpiano22(); loadpiano23(); loadpiano24(); loadpiano25(); loadpiano26(); loadpiano27(); loadpiano28(); loadpiano29(); loadpiano30(); loadpiano31(); loadpiano32(); loadpiano33(); loadpiano34(); loadpiano35(); loadpiano36();
+        loadsine01(); loadsine02(); loadsine03(); loadsine04(); loadsine05(); loadsine06(); loadsine07(); loadsine08(); loadsine09(); loadsine10(); loadsine11(); loadsine12(); loadsine13(); loadsine14(); loadsine15();
+
+
+
+        //loading tilesets
+        var tileset = null, tilesetURL = "tiles.png",  tilesetLoaded = false;
+
+        var tileTypes = {
+        //world 1
+
+            0: { sprite:[{x:tileW*0, y:tileH*0, w:tileW, h:tileH}]}, 
+            1: { sprite:[{x:tileW*1, y:tileH*0, w:tileW, h:tileH}]},
+            2: { sprite:[{x:tileW*2, y:tileH*0, w:tileW, h:tileH}]},
+            3: { sprite:[{x:tileW*3, y:tileH*0, w:tileW, h:tileH}]},
+            4: { sprite:[{x:tileW*4, y:tileH*0, w:tileW, h:tileH}]},
+            5: { sprite:[{x:tileW*5, y:tileH*0, w:tileW, h:tileH}]}, 
+            6: { sprite:[{x:tileW*6, y:tileH*0, w:tileW, h:tileH}]},
+            7: { sprite:[{x:tileW*7, y:tileH*0, w:tileW, h:tileH}]},
+            8: { sprite:[{x:tileW*0, y:tileH*1, w:tileW, h:tileH}]},
+            9: { sprite:[{x:tileW*1, y:tileH*1, w:tileW, h:tileH}]},
+            10: { sprite:[{x:tileW*2, y:tileH*1, w:tileW, h:tileH}]}, 
+            11: { sprite:[{x:tileW*3, y:tileH*1, w:tileW, h:tileH}]},
+            12: { sprite:[{x:tileW*4, y:tileH*1, w:tileW, h:tileH}]},
+            13: { sprite:[{x:tileW*5, y:tileH*1, w:tileW, h:tileH}]},
+            14: { sprite:[{x:tileW*6, y:tileH*1, w:tileW, h:tileH}]},
+            15: { sprite:[{x:tileW*7, y:tileH*1, w:tileW, h:tileH}]},
+            16: { sprite:[{x:tileW*8, y:tileH*0, w:tileW*124, h:tileH*3}]},//plane
+            17: { sprite:[{x:tileW*0, y:tileH*2, w:tileW*8, h:tileH*3}]},//cloud1
+            18: { sprite:[{x:tileW*0, y:tileH*5, w:tileW*9, h:tileH*4}]},//cloud2
+            19: { sprite:[{x:tileW*0, y:tileH*9, w:tileW*9, h:tileH*4}]},//cloud3
+
+        };
+
+
+        //Viewport Scanning
+        window.onload = function()
+        {
+            canvas = document.getElementById('periphery')
+            ctx = canvas.getContext("2d");
+            ctx.canvas.width = w;
+            ctx.canvas.height = h;
+            requestAnimationFrame(drawGame);
+            //initialize();
+            ctx.font = "bold 10pt sans-serif";
+            //viewport.screen = [document.getElementById('periphery').width, document.getElementById('periphery').height];
+            tileset = new Image();
+            tileset.onerror = function()
+            { ctx = null; alert("Failed loding tileset."); };
+            tileset.onload = function() { tilesetLoaded = true; }
+            tileset.src = tilesetURL;
+        };
+
+        // Start listening to resize events and draw canvas.
+
+        function initialize() {
+            // Register an event listener to call the resizeCanvas() function 
+            // each time the window is resized.
+            window.addEventListener('resize', resizeCanvas, false);
+            // Draw canvas border for the first time.
+            resizeCanvas();
+            
+        }
+
+        // Display custom canvas. In this case it's a blue, 5 pixel 
+        // border that resizes along with the browser window.
+        function redraw() {
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = '1';
+            // ctx.strokeRect(0, 0, w, h);
+            ctx.strokeRect(window.innerWidth/2-75, h * 0.379, 150, 10);
+            ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+            ctx.fillRect(window.innerWidth/2-75, h * 0.379, checkBuffers() * 1.2, 10);
+        }
+
+        // Runs each time the DOM window resize event fires.
+        // Resets the canvas dimensions to match window,
+        // then draws the new borders accordingly.
+        function resizeCanvas() {
+            redraw();
+        }
+
+        // function Cloud(x,y)
+        // {
+        //     this.position = [x/2, randomInt(300)]
+        //     this.maxWidth = randomInt(100) + 200;
+        //     this.maxHeight = randomInt(100) + 50;
+        //     this.density = randomInt(100) + 25;
+        // }
+
+        // Cloud.prototype.draw = function(cset)
+        // {
+        //     //console.log(cset);
+        //     ctx.fillStyle = "rgba(254,211,106,0.5)"; // top sky yellow
+        //     for(let i = 0; i < cset.length; i++)
+        //     {
+        //         let drawCircle = new Function(cset[i]);
+        //         ctx.beginPath();
+        //         drawCircle();
+        //         ctx.fill();
+        //         ctx.closePath();
+        //     }
+        // };
+
+        function Wave()
+        { 
+            this.position = [randomInt(w), randomInt(h * 0.45) + (h * 0.51)] 
+            this.tile = tileTypes[randomInt(14)];
+        }
+        Wave.prototype.draw = function()
+        {
+            ctx.drawImage(tileset, this.tile.sprite[0].x, this.tile.sprite[0].y, 
+            this.tile.sprite[0].w, this.tile.sprite[0].h, 
+            this.position[0], this.position[1], tileW * 0.75, tileH * 0.75);
+            if(this.position[0] <= -20)
+            {
+                this.position = [w, randomInt(h * 0.45) + (h * 0.51)];
+            }
+            else { this.position[0] -= this.position[1]/(h*0.4); }
+        };
+
+        function Plane()
+        { 
+            this.position = [-1 * (tileW*124 + 60), randomInt(h*0.4)] 
+            this.tile = tileTypes[16];
+        }
+        Plane.prototype.draw = function()
+        {
+            ctx.drawImage(tileset, this.tile.sprite[0].x, this.tile.sprite[0].y, 
+            this.tile.sprite[0].w, this.tile.sprite[0].h, 
+            this.position[0], this.position[1], tileW*124 * 0.5, tileH*3 * 0.5);
+            if(this.position[0] >= w)
+            {
+                this.position = [-1 * (tileW*124 + 60), randomInt(h*0.4)];
+            }
+            else { this.position[0] += 0.25; }
+        };
+
+        function Cloud()
+        { 
+            this.position = [randomInt(w), randomInt(h * 0.4) + (h * 0.1)];
+            this.tile = tileTypes[randomInt(2) + 17];
+            this.scale = (Math.random() * 1.5) + 1;
+        }
+        Cloud.prototype.draw = function()
+        {
+            ctx.drawImage(tileset, this.tile.sprite[0].x, this.tile.sprite[0].y, 
+            this.tile.sprite[0].w, this.tile.sprite[0].h, 
+            this.position[0], this.position[1], this.tile.sprite[0].w * this.scale, this.tile.sprite[0].h * this.scale);
+            if(this.position[0] <= -1 * (this.tile.sprite[0].w * this.scale))
+            {
+                this.position = [w, randomInt(h * 0.3 + (h * 0.15))];
+            }
+            else { this.position[0] -= (this.position[1]/(h*0.2)) * 0.15 ; }
+        };
+
+
+
+
+
+        //Drop opening map
+        window.addEventListener("click", startGame);
+        function startGame() { 
+            if(isPlaying == false)
+            //&& allBuffersLoaded == true)
+            {
+                loadclick();
+                playclick();
+                const textDisappear = document.querySelector('#info');
+                textDisappear.style.visibility = 'hidden';
+                //masterGain.gain.linearRampToValueAtTime(-0.001, (audioCtx.currentTime)); 
+
+                //setTimeout(() => { masterGain.gain.linearRampToValueAtTime(1, (audioCtx.currentTime) + 5.0); }, 5000);
+
+                isPlaying = true;
+                let celloWait = randomInt(4000) + 8000;
+                let pianoWait = randomInt(4000) + 4000;
+                let fluteWait = randomInt(4000) + 6000;
+                let sine1Wait = 2000;
+                let sine2Wait = randomInt(10000) + 10000
+                setTimeout(() => { canPlayCello = true; }, celloWait);
+                setTimeout(() => { canPlayPiano = true; }, pianoWait);
+                setTimeout(() => { canPlayFlute = true; }, fluteWait);
+                setTimeout(() => { canPlaySine1 = true; }, sine1Wait);
+                setTimeout(() => { canPlaySine2 = true; }, sine2Wait);
+            } 
+            else if(isPlaying == true)
+            {
+                const textDisappear = document.querySelector('#info2');
+                if(textDisappear.style.visibility == 'visible')
+                { textDisappear.style.visibility = 'hidden'; }
+                else { textDisappear.style.visibility = 'visible' }
+            }
+            else { }
+        }
+
+        drawStartingMap();
+        // var cloud = new Cloud(width,height);
+        // cloud.buildCloud();
+
+        //draw instantiate 500 waves
+        var wave = [];
+        for(let i = waveNum; i > 0; i--)
+        {
+            wave[i] = new Wave();
+        }
+
+
+        var cloud = [];
+        for(let i = cloudNum; i > 0; i--)
+        {
+            cloud[i] = new Cloud();
+        }
+
+        var plane = new Plane();
+
+        //Animation
+        function drawGame()
+        {
+            if(ctx==null) { return; }
+
+            var currentFrameTime = Date.now();
+            var timeElapsed = currentFrameTime - lastFrameTime;
+            var sec = Math.floor(Date.now()/1000);
+
+            //frameCount
+            if(sec!=currentSecond)
+            {
+                currentSecond = sec;
+                framesLastSecond = frameCount;
+                frameCount = 1;
+            }
+            else { frameCount++; }
+
+            //////////////////////////////draw background
+            ctx.fillStyle = "rgb(252, 233, 193)";
+            ctx.fillRect(0, 0, w, h);
+            //ctx.strokeStyle = "#696969";
+            //ctx.lineWidth = 2;
+            //ctx.strokeRect(-2, -2, viewport.screen[0]+2, viewport.screen[1]+2);
+
+
+            drawSky();
+            for(let i = cloudNum; i > 0; i--)
+            { cloud[i].draw(); }
+            drawSea();
+            //draw waves
+            for(let i = waveNum; i > 0; i--)
+            { wave[i].draw(); }
+            plane.draw();
+
+            if(isPlaying == true)
+            {
+                plane.draw();
+                //handle snd
+                playCelloSound();
+                playPianoSound();
+                playFluteSound();
+                playSine1Sound(); 
+                playSine2Sound();   
+            }
+            if(isPlaying == false)
+            {
+                //console.log(checkBuffers());
+                ctx.fillStyle = "rgba(252, 233, 193,0.9)";
+                ctx.fillRect(0, 0, w, h);
+                initialize();
+                if(checkBuffers() == 125)
+                {
+                    allBuffersLoaded = true;
+                    let loaded = document.getElementById('loading');
+                    loaded.innerHTML = '(click anywhere to begin)';
+                }
+            }
+
+            // //////////frame rate check
+            // ctx.fillStyle = "#ff0000";
+            // ctx.font = "10px Andale Mono";
+            // ctx.textAlign = "start";
+            // ctx.fillText("FPS: " + framesLastSecond, 10, 20);
+
+            lastFrameTime = currentFrameTime;
+            requestAnimationFrame(drawGame);
+
+
+        }
+
+
+</script>
+
+</head>
+<body>
+<div style="text-align:center"> 
+	<canvas id="periphery"></canvas>
+</div>
+<div id="info2">
+    <h3>P &nbsp;&nbsp; E &nbsp;&nbsp; R &nbsp;&nbsp; I &nbsp;&nbsp; P &nbsp;&nbsp; H &nbsp;&nbsp; E &nbsp;&nbsp; R &nbsp;&nbsp; Y</h3>
+    <h5>composed 2015, generative version 2022</h5>
+    <p>Sasha Launer, <i>flute</i></p>
+    <p>Katy Luo, <i>piano</i></p>
+    <p>Crystal Pascucci, <i>cello</i></p>
+    <p>Danny Clay, <i>tones, programming</i></p>
+    <p>visuals based on a print by Jon Fischer</p>
+    <p>album available on <a href="https://dannyclay.bandcamp.com/album/periphery-2017">Bandcamp</a></p>
+</div>
+<div id="info">
+    <h3>P &nbsp;&nbsp; E &nbsp;&nbsp; R &nbsp;&nbsp; I &nbsp;&nbsp; P &nbsp;&nbsp; H &nbsp;&nbsp; E &nbsp;&nbsp; R &nbsp;&nbsp; Y</h3>
+    <h5>composed 2015, generative version 2022</h5>
+    <p>Sasha Launer, <i>flute</i></p>
+    <p>Katy Luo, <i>piano</i></p>
+    <p>Crystal Pascucci, <i>cello</i></p>
+    <p>Danny Clay, <i>tones, programming</i></p>
+    <p>visuals based on a print by Jon Fischer</p>
+    <br>
+    <h5 id="loading">(sounds are loading)</h5>
+</div>
+<div>
+</div>
+</body>
+</html>
